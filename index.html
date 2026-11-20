@@ -2932,7 +2932,7 @@
       const formattedDate =
         `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
-      const fileName = `Genius_respaldo_(${formattedDate}).json`;
+      const fileName = `Genium_respaldo_(${formattedDate}).json`;
 
       const dataStr = JSON.stringify(
         {
@@ -3091,7 +3091,7 @@
           heightLeft -= pageHeight;
         }
 
-        pdf.save(`Genius-${boards[currentBoardId].name}.pdf`);
+        pdf.save(`Genium-${boards[currentBoardId].name}.pdf`);
         showToast('PDF generado correctamente', 'success');
       });
       shareModal.style.display = 'none';
@@ -3102,7 +3102,7 @@
       html2canvas(board).then(canvas => {
         const image = canvas.toDataURL('image/png');
         const link = document.createElement('a');
-        link.download = `Genius-${boards[currentBoardId].name}.png`;
+        link.download = `Genium-${boards[currentBoardId].name}.png`;
         link.href = image;
         link.click();
         showToast('Imagen guardada correctamente', 'success');
@@ -3132,7 +3132,7 @@
     </div>
     <div style="width: 1px; height: 24px; background-color: #cbd5e1;"></div>
     <div style="display: flex; flex-direction: column; line-height: 1.2;">
-      <span style="font-size: 0.5rem; color: #0A2540;">Genius</span>
+      <span style="font-size: 0.5rem; color: #0A2540;">Genium</span>
       <span style="font-size: 0.4rem; color: #94a3b8; font-weight: 500;">V1.0 | Mayo 2026</span>
     </div>
   </div>
