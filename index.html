@@ -100,7 +100,7 @@
     }
 
     .tool-group {
-      margin-bottom: 28px;
+      margin-bottom: 24px;
     }
 
     .tool-group h3 {
@@ -172,24 +172,132 @@
       transform: scale(1.1);
     }
 
-    .user-section {
-      padding: 20px;
+    /* Collapsible Manage Dropdown */
+    .manage-group {
+      padding-top: 18px;
       border-top: 1px solid var(--gray-light);
-      display: flex;
-      align-items: center;
-      background: var(--gradient-card);
-      cursor: pointer;
-      transition: var(--transition);
     }
 
-    .user-section:hover {
+    .manage-toggle-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--gray-light);
+      background: var(--gradient-card);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: var(--transition);
+      color: var(--dark);
+      font-weight: 600;
+      box-shadow: var(--shadow);
+    }
+
+    .manage-toggle-btn:hover {
+      background: var(--gradient-primary);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .manage-toggle-btn.open {
       background: var(--gradient-primary);
       color: white;
     }
 
+    .manage-toggle-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .manage-toggle-left i.fa-cog {
+      transition: transform 0.25s ease;
+    }
+
+    .manage-toggle-btn.open .manage-toggle-left i.fa-cog {
+      transform: rotate(90deg);
+    }
+
+    .manage-chevron {
+      font-size: 0.85rem;
+      transition: transform 0.25s ease;
+    }
+
+    .manage-toggle-btn.open .manage-chevron {
+      transform: rotate(180deg);
+    }
+
+    .manage-drawer {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 12px;
+      animation: drawerFade 0.2s ease;
+    }
+
+    .manage-drawer.open {
+      display: flex;
+    }
+
+    @keyframes drawerFade {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .manage-subsection {
+      background: rgba(255, 255, 255, 0.45);
+      border: 1px solid var(--gray-light);
+      border-radius: var(--radius);
+      padding: 12px;
+    }
+
+    .manage-subsection-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--gray);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .manage-subsection .tool-btn:last-child {
+      margin-bottom: 0;
+    }
+
+    .user-manage-card {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--gray-light);
+      border-radius: var(--radius);
+      background: var(--gradient-card);
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: var(--shadow);
+      text-align: left;
+      color: var(--dark);
+    }
+
+    .user-manage-card:hover {
+      background: var(--gradient-primary);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .user-manage-card:hover .user-status {
+      color: rgba(255, 255, 255, 0.85);
+    }
+
     .user-avatar {
-      width: 44px;
-      height: 44px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       background: var(--gradient-primary);
       color: white;
@@ -198,8 +306,34 @@
       justify-content: center;
       font-weight: bold;
       margin-right: 12px;
-      font-size: 1.1rem;
+      font-size: 1rem;
       box-shadow: var(--shadow);
+      flex-shrink: 0;
+    }
+
+    .user-name {
+      font-weight: 600;
+      font-size: 0.92rem;
+    }
+
+    .user-status {
+      font-size: 0.75rem;
+      color: var(--gray);
+      transition: var(--transition);
+    }
+
+    .import-export-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .import-export-actions .tool-btn {
+      margin-bottom: 0;
+    }
+
+    .file-input {
+      display: none;
     }
 
     /* Main Content */
@@ -225,12 +359,16 @@
       display: flex;
       align-items: center;
       gap: 15px;
+      min-width: 0;
     }
 
     .board-info h2 {
       font-size: 1.4rem;
       color: var(--dark);
       font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .edit-board-name {
@@ -241,6 +379,7 @@
       padding: 5px;
       border-radius: 4px;
       transition: var(--transition);
+      flex-shrink: 0;
     }
 
     .edit-board-name:hover {
@@ -284,6 +423,11 @@
       border: 1px solid var(--gray-light);
     }
 
+    .danger-btn {
+      background: var(--gradient-accent);
+      color: white;
+    }
+
     /* Tabs */
     .tabs-container {
       background: var(--gradient-card);
@@ -292,16 +436,19 @@
       display: flex;
       align-items: center;
       overflow-x: auto;
+      gap: 8px;
     }
 
     .tabs {
       display: flex;
-      gap: 5px;
+      gap: 6px;
       padding: 10px 0;
+      align-items: center;
+      min-width: 0;
     }
 
     .tab {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       padding: 8px 16px;
       background: var(--gradient-light);
@@ -311,10 +458,20 @@
       border: 1px solid transparent;
       border-bottom: none;
       white-space: nowrap;
-      max-width: 200px;
+      max-width: 210px;
+      min-width: 0;
+      flex-shrink: 0;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      user-select: none;
+    }
+
+    .tab-name {
+      display: block;
+      min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
-      box-shadow: var(--shadow);
+      white-space: nowrap;
     }
 
     .tab.active {
@@ -329,25 +486,6 @@
       color: white;
     }
 
-    .tab-close {
-      margin-left: 8px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--gray);
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .tab-close:hover {
-      background: var(--gray-light);
-      color: var(--danger);
-    }
-
     .add-tab {
       background: var(--gradient-primary);
       border: none;
@@ -356,7 +494,8 @@
       cursor: pointer;
       padding: 8px;
       border-radius: var(--radius);
-      margin-left: 10px;
+      margin-left: 4px;
+      flex-shrink: 0;
       transition: var(--transition);
       box-shadow: var(--shadow);
     }
@@ -420,112 +559,105 @@
     }
 
     /* Note Styles */
-.note {
-  position: absolute;
-  width: 260px;                     /* ancho fijo recomendado, ajusta si quieres */
-  min-height: 140px;                /* altura mínima razonable */
-  height: auto;                     /* ¡clave! permite crecer */
-  max-height: none;                 /* quitamos límite superior */
-  padding: 16px 16px 20px 16px;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-lg);
-  cursor: move;
-  transition: var(--transition), height 0.3s ease;
-  backdrop-filter: blur(10px);
-  overflow: hidden;                 /* mantenemos para que no desborde visualmente */
-  display: flex;
-  flex-direction: column;
-  touch-action: none;
-  background: rgba(255, 255, 255, 0.95);
-}
+    .note {
+      position: absolute;
+      width: 260px;
+      min-height: 140px;
+      height: auto;
+      max-height: none;
+      padding: 16px 16px 20px 16px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      cursor: move;
+      transition: var(--transition), height 0.3s ease;
+      backdrop-filter: blur(10px);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      touch-action: none;
+      background: rgba(255, 255, 255, 0.95);
+    }
 
-.note:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
-  z-index: 10;
-}
+    .note:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+      z-index: 10;
+    }
 
-/* Header */
-.note-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
+    .note-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
 
-/* Título */
-.note-title {
-  font-weight: 700;
-  font-size: 1.05rem;
-  line-height: 1.35;
-  margin: 0 0 10px 0;
-  padding-bottom: 6px;
-  border-bottom: 1px solid rgba(0,0,0,0.09);
-  color: #1e293b;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+    .note-title {
+      font-weight: 700;
+      font-size: 1.05rem;
+      line-height: 1.35;
+      margin: 0 0 10px 0;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(0,0,0,0.09);
+      color: #1e293b;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
-/* Contenido principal */
-.note-content {
-  flex: 1 1 auto;
-  margin: 0;
-  font-size: 0.93rem;
-  line-height: 1.58;
-  color: #334155;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  hyphens: auto;
-  /* Sin height fija → se adapta al texto */
-}
+    .note-content {
+      flex: 1 1 auto;
+      margin: 0;
+      font-size: 0.93rem;
+      line-height: 1.58;
+      color: #334155;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      hyphens: auto;
+    }
 
-/* Footer */
-.note-footer {
-  margin-top: 12px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(0,0,0,0.06);
-  font-size: 0.78rem;
-  color: #64748b;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+    .note-footer {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      font-size: 0.78rem;
+      color: #64748b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-/* ---------------------- MODO EXPANDIDO ---------------------- */
-.note.expanded {
-  width: auto !important;           /* permite crecer horizontalmente si es necesario */
-  min-height: 220px;
-  max-height: 70vh;                 /* límite razonable para no tapar toda la pantalla */
-  height: auto;
-  overflow-y: auto;                 /* scroll solo si es MUY largo */
-  padding-bottom: 28px;
-  z-index: 100;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-}
+    .note.expanded {
+      width: auto !important;
+      min-height: 220px;
+      max-height: 70vh;
+      height: auto;
+      overflow-y: auto;
+      padding-bottom: 28px;
+      z-index: 100;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
 
-.note.expanded .note-title {
-  white-space: normal;              /* permite multilínea en expandido */
-  overflow: visible;
-}
+    .note.expanded .note-title {
+      white-space: normal;
+      overflow: visible;
+    }
 
-.note.expanded .note-content {
-  max-height: none;
-  overflow: visible;
-  line-height: 1.65;
-}
+    .note.expanded .note-content {
+      max-height: none;
+      overflow: visible;
+      line-height: 1.65;
+    }
 
-/* Responsive (móviles) */
-@media (max-width: 768px) {
-  .note {
-    width: 90% !important;
-    max-width: 340px;
-  }
-  .note.expanded {
-    width: 94% !important;
-    max-width: 380px;
-  }
-}
+    @media (max-width: 768px) {
+      .note {
+        width: 90% !important;
+        max-width: 340px;
+      }
+      .note.expanded {
+        width: 94% !important;
+        max-width: 380px;
+      }
+    }
 
     /* Modal */
     .modal {
@@ -592,7 +724,6 @@
       background: var(--gradient-light);
     }
 
-    /* Solo para el textarea de contenido: ajuste manual VERTICAL, ancho fijo */
     #note-content {
       resize: vertical;
     }
@@ -607,8 +738,16 @@
       padding: 18px 24px;
       background: var(--gradient-light);
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
+      align-items: center;
       gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .modal-footer-right {
+      display: flex;
+      gap: 12px;
+      margin-left: auto;
     }
 
     /* Toast */
@@ -641,22 +780,6 @@
 
     .toast.success { background: var(--gradient-primary); }
     .toast.error { background: var(--gradient-accent); }
-
-    /* Import/Export section */
-    .import-export {
-      padding: 20px;
-      border-top: 1px solid var(--gray-light);
-    }
-
-    .import-export-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .file-input {
-      display: none;
-    }
 
     /* Share modal */
     .share-options {
@@ -796,7 +919,6 @@
     .user-action:hover { background: var(--gradient-primary); color: white; }
     .user-action.delete:hover { background: var(--gradient-accent); color: white; }
 
-    /* Responsive Styles MEJORADOS PARA CELULARES */
     .menu-toggle {
       display: none;
       background: var(--gradient-primary);
@@ -823,7 +945,6 @@
       z-index: 99;
     }
 
-    /* Ajustes para tablets y celulares */
     @media (max-width: 1024px) {
       .sidebar {
         position: fixed;
@@ -852,13 +973,10 @@
         justify-content: space-between;
         width: 100%;
       }
-      
+
       .board-info h2 {
         font-size: 1.2rem;
         max-width: 200px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
       }
 
       .board-actions {
@@ -866,117 +984,67 @@
         justify-content: space-between;
         gap: 8px;
       }
-      
+
       .action-btn {
         flex: 1;
         justify-content: center;
         padding: 10px 12px;
       }
-      
-      .action-btn span { 
-        display: inline-block; 
+
+      .action-btn span {
+        display: inline-block;
         font-size: 0.85rem;
         margin-left: 6px;
       }
-      
-      .action-btn i { 
+
+      .action-btn i {
         margin-right: 0;
         font-size: 1rem;
       }
 
-      .board-container { 
-        padding: 12px; 
-      }
-      
-      .tabs-container { 
-        padding: 0 12px;
-      }
-      
+      .board-container { padding: 12px; }
+      .tabs-container { padding: 0 12px; }
+
       .tab {
-        max-width: 140px;
+        max-width: 145px;
         font-size: 0.85rem;
         padding: 6px 12px;
       }
 
-      .modal-content { 
+      .modal-content {
         width: 92vw;
         max-width: 92vw;
         margin: 16px;
       }
-      
-      .share-options { 
+
+      .share-options {
         flex-direction: row;
         flex-wrap: wrap;
       }
-      
-      .share-option { 
+
+      .share-option {
         min-width: calc(50% - 12px);
         flex: 0 0 calc(50% - 12px);
         padding: 12px;
       }
-      
-      .share-option span {
-        font-size: 0.8rem;
-      }
 
-      .color-palette {
-        gap: 10px;
-      }
-      
-      .color-option {
-        width: 32px;
-        height: 32px;
-      }
-      
-      .user-section {
-        padding: 16px;
-      }
-      
-      .user-avatar {
-        width: 38px;
-        height: 38px;
-        font-size: 0.9rem;
-      }
-      
-      .user-name {
-        font-size: 0.9rem;
-      }
-      
-      .user-status {
-        font-size: 0.7rem;
-      }
-      
-      .tool-btn {
-        padding: 10px 14px;
-      }
-      
-      .tool-btn span {
-        font-size: 0.9rem;
-      }
-      
-      .modal-header {
-        padding: 16px;
-      }
-      
-      .modal-body {
-        padding: 16px;
-      }
-      
-      .modal-footer {
-        padding: 16px;
-        flex-wrap: wrap;
-      }
-      
-      .modal-footer .action-btn {
-        flex: 1;
-        justify-content: center;
-      }
-      
+      .share-option span { font-size: 0.8rem; }
+      .color-palette { gap: 10px; }
+      .color-option { width: 32px; height: 32px; }
+      .user-avatar { width: 36px; height: 36px; font-size: 0.9rem; }
+      .user-name { font-size: 0.88rem; }
+      .user-status { font-size: 0.7rem; }
+      .tool-btn { padding: 10px 14px; }
+      .tool-btn span { font-size: 0.9rem; }
+      .modal-header { padding: 16px; }
+      .modal-body { padding: 16px; }
+      .modal-footer { padding: 16px; }
+
       .user-card {
         flex-wrap: wrap;
         gap: 12px;
       }
-      
+
       .user-card-actions {
         width: 100%;
         justify-content: flex-end;
@@ -987,65 +1055,55 @@
       .logo { padding: 16px; }
       .logo h1 { font-size: 1.3rem; }
       .logo img { max-width: 100px; }
-      
       .tools { padding: 16px; }
-      
       .tool-group h3 { font-size: 0.75rem; }
-      
       .tool-btn { padding: 8px 12px; }
       .tool-btn i { margin-right: 8px; }
       .tool-btn span { font-size: 0.85rem; }
-      
       .board-info h2 { font-size: 1rem; max-width: 150px; }
-      
-      .action-btn span { 
+
+      .action-btn span {
         display: inline-block;
         font-size: 0.75rem;
       }
-      
+
       .action-btn i { font-size: 0.9rem; }
       .action-btn { padding: 8px 10px; }
-      
       .tabs-container { padding: 0 8px; }
-      .tab { 
-        padding: 4px 10px; 
-        max-width: 120px;
+
+      .tab {
+        padding: 4px 10px;
+        max-width: 125px;
         font-size: 0.75rem;
       }
-      
-      .add-tab { 
+
+      .add-tab {
         padding: 4px 8px;
         font-size: 1rem;
       }
-      
+
       .board-container { padding: 8px; }
-      
       .modal-header h3 { font-size: 1.1rem; }
-      
       .form-group label { font-size: 0.85rem; }
       .form-control { padding: 10px; font-size: 0.9rem; }
-      
-      .share-option { 
+
+      .share-option {
         min-width: calc(100% - 12px);
         flex: 0 0 100%;
         flex-direction: row;
         justify-content: center;
         gap: 8px;
       }
-      
-      .share-option i { 
+
+      .share-option i {
         font-size: 1.2rem;
         margin-bottom: 0;
       }
-      
-      .color-option {
-        width: 28px;
-        height: 28px;
-      }
-      
+
+      .color-option { width: 28px; height: 28px; }
       .empty-state h3 { font-size: 1.2rem; }
       .empty-state p { font-size: 0.85rem; }
-      
+
       .toast {
         bottom: 16px;
         right: 16px;
@@ -1055,39 +1113,17 @@
       }
     }
 
-    /* Ajuste para pantallas muy pequeñas */
     @media (max-width: 360px) {
-      .board-actions {
-        gap: 6px;
-      }
-      
-      .action-btn span {
-        display: none;
-      }
-      
-      .action-btn i {
-        margin-right: 0;
-        font-size: 1.1rem;
-      }
-      
-      .action-btn {
-        padding: 8px;
-        min-width: 40px;
-      }
-      
-      .board-info h2 {
-        font-size: 0.9rem;
-        max-width: 120px;
-      }
-      
-      .tab {
-        max-width: 100px;
-        font-size: 0.7rem;
-      }
+      .board-actions { gap: 6px; }
+      .action-btn span { display: none; }
+      .action-btn i { margin-right: 0; font-size: 1.1rem; }
+      .action-btn { padding: 8px; min-width: 40px; }
+      .board-info h2 { font-size: 0.9rem; max-width: 120px; }
+      .tab { max-width: 105px; font-size: 0.7rem; }
     }
 
     /* ============================================================
-       PREMIUM THEME OVERRIDE (solo diseño, no cambia funcionalidad)
+       PREMIUM THEME OVERRIDE
        ============================================================ */
     :root{
       --primary: #0ea5e9;
@@ -1173,20 +1209,29 @@
     .action-btn,
     .share-option,
     .user-item,
-    .user-card{
+    .user-card,
+    .user-manage-card,
+    .manage-toggle-btn{
       border: 1px solid rgba(15,23,42,.10);
     }
     .tool-btn,
-    .action-btn{
+    .action-btn,
+    .user-manage-card,
+    .manage-toggle-btn{
       background: linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.58));
     }
     .tool-btn:hover,
-    .action-btn:hover{
+    .action-btn:hover,
+    .user-manage-card:hover,
+    .manage-toggle-btn:hover{
       transform: translateY(-2px);
       box-shadow: var(--shadow-lg);
     }
-    .tool-btn:hover{ background: var(--gradient-secondary); }
-    .tool-btn.active{ background: var(--gradient-primary); }
+    .tool-btn:hover,
+    .user-manage-card:hover,
+    .manage-toggle-btn:hover{ background: var(--gradient-secondary); }
+    .tool-btn.active,
+    .manage-toggle-btn.open{ background: var(--gradient-primary); color: white; }
 
     .primary-btn{
       background: var(--gradient-primary);
@@ -1199,12 +1244,17 @@
       background: radial-gradient(600px 120px at 20% 0%, rgba(255,255,255,.40), transparent 55%);
       pointer-events:none;
     }
+    .danger-btn{
+      background: var(--gradient-accent);
+    }
     .secondary-btn{
       background: linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.54));
     }
 
     .tool-btn:focus-visible,
     .action-btn:focus-visible,
+    .user-manage-card:focus-visible,
+    .manage-toggle-btn:focus-visible,
     .form-control:focus-visible,
     .tab:focus-visible,
     .add-tab:focus-visible{
@@ -1304,8 +1354,6 @@
       background: var(--gradient-primary);
       border-color: rgba(255,255,255,.30);
     }
-    .user-section{ border-top: 1px solid rgba(15,23,42,.08); }
-    .user-section:hover{ background: var(--gradient-secondary); }
 
     .toast{
       border: 1px solid rgba(255,255,255,.22);
@@ -1317,8 +1365,7 @@
     }
 
     /* ============================================================
-       SOFT DARK MODE (no tan negro) - solo diseño
-       Se activa automáticamente con el sistema
+       SOFT DARK MODE
        ============================================================ */
     @media (prefers-color-scheme: dark) {
       :root{
@@ -1369,13 +1416,36 @@
       .tool-group h3{ color: rgba(229,231,235,.70); }
       .board-info h2{ color: rgba(229,231,235,.92); }
 
+      .manage-subsection {
+        background: rgba(15, 23, 42, 0.45);
+        border: 1px solid rgba(148, 163, 184, 0.16);
+      }
+
+      .manage-subsection-title {
+        color: rgba(229, 231, 235, 0.65);
+      }
+
       .tool-btn,
-      .action-btn{
+      .action-btn,
+      .user-manage-card,
+      .manage-toggle-btn{
         color: rgba(229,231,235,.92);
         border: 1px solid rgba(148,163,184,.14);
         background: linear-gradient(180deg, rgba(15,23,42,.72), rgba(15,23,42,.52));
       }
-      .tool-btn:hover{ color: white; }
+      .tool-btn:hover,
+      .user-manage-card:hover,
+      .manage-toggle-btn:hover{ color: white; }
+
+      .manage-toggle-btn.open {
+        color: white;
+        background: var(--gradient-primary);
+      }
+
+      .danger-btn {
+        color: white;
+        background: var(--gradient-accent);
+      }
 
       .secondary-btn{
         color: rgba(229,231,235,.92);
@@ -1392,8 +1462,6 @@
         background: rgba(15,23,42,.78);
         color: var(--primary);
       }
-      .tab-close{ color: rgba(229,231,235,.65); }
-      .tab-close:hover{ background: rgba(148,163,184,.14); }
 
       .board{
         border: 1px solid rgba(148,163,184,.16);
@@ -1428,19 +1496,11 @@
       }
       .user-item:hover{ background: rgba(56,189,248,.10); }
 
-      /* Tus notas tienen color pastel inline, dejamos texto oscuro para que se lea */
       .note-title{ color: rgba(15,23,42,.90); }
       .note-content{ color: rgba(15,23,42,.80); }
       .note-footer{ color: rgba(15,23,42,.70); }
-
-      body > div[style*="By Pablo Ojeda"]{
-        color: rgba(229,231,235,.55) !important;
-      }
     }
 
-    /* =====================================================================
-       FIX FINAL (DEBE SER LO ÚLTIMO): el cuadro del logo NO debe quedar verde
-       ===================================================================== */
     @media (prefers-color-scheme: dark) {
       .sidebar .logo{
         background:
@@ -1501,28 +1561,49 @@
           </div>
         </div>
 
-        <div class="import-export">
-          <h3>Gestionar</h3>
-          <div class="import-export-actions">
-            <button class="tool-btn" id="import-btn">
-              <i class="fas fa-file-import"></i> <span>Importar</span>
-            </button>
-            <button class="tool-btn" id="export-btn">
-              <i class="fas fa-file-export"></i> <span>Exportar</span>
-            </button>
-            <button class="tool-btn" id="share-btn-sidebar">
-              <i class="fas fa-share-alt"></i> <span>Compartir</span>
-            </button>
-            <input type="file" id="file-input" class="file-input" accept=".json" />
-          </div>
-        </div>
-      </div>
+        <div class="tool-group manage-group">
+          <button type="button" class="manage-toggle-btn" id="manage-toggle-btn" aria-expanded="false" aria-controls="manage-drawer">
+            <span class="manage-toggle-left">
+              <i class="fas fa-cog"></i>
+              <span>Gestionar</span>
+            </span>
+            <i class="fas fa-chevron-down manage-chevron"></i>
+          </button>
 
-      <div class="user-section" id="user-section">
-        <div class="user-avatar" id="current-user-avatar">TU</div>
-        <div>
-          <div class="user-name" id="current-user-name">Gestionar Usuarios</div>
-          <div class="user-status">Haz clic para administrar</div>
+          <div class="manage-drawer" id="manage-drawer">
+            <!-- Sección 1: Gestión de Usuarios -->
+            <div class="manage-subsection">
+              <div class="manage-subsection-title">
+                <i class="fas fa-users"></i> <span>Usuarios</span>
+              </div>
+              <button type="button" class="user-manage-card" id="user-section">
+                <div class="user-avatar" id="current-user-avatar">TU</div>
+                <div>
+                  <div class="user-name" id="current-user-name">Gestionar Usuarios</div>
+                  <div class="user-status">Haz clic para administrar</div>
+                </div>
+              </button>
+            </div>
+
+            <!-- Sección 2: Otros Eventos (Importar, Exportar, Compartir) -->
+            <div class="manage-subsection">
+              <div class="manage-subsection-title">
+                <i class="fas fa-sliders-h"></i> <span>Pizarra y Respaldos</span>
+              </div>
+              <div class="import-export-actions">
+                <button class="tool-btn" id="import-btn">
+                  <i class="fas fa-file-import"></i> <span>Importar</span>
+                </button>
+                <button class="tool-btn" id="export-btn">
+                  <i class="fas fa-file-export"></i> <span>Exportar</span>
+                </button>
+                <button class="tool-btn" id="share-btn-sidebar">
+                  <i class="fas fa-share-alt"></i> <span>Compartir</span>
+                </button>
+                <input type="file" id="file-input" class="file-input" accept=".json" />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1535,7 +1616,7 @@
         </button>
         <div class="board-info">
           <h2 id="current-board-name">Sin pizarra activa</h2>
-          <button class="edit-board-name" id="edit-board-name" title="Editar nombre">
+          <button class="edit-board-name" id="edit-board-name" title="Editar pizarra">
             <i class="fas fa-edit"></i>
           </button>
         </div>
@@ -1608,8 +1689,10 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="action-btn secondary-btn" id="cancel-note">Cancelar</button>
-        <button class="action-btn primary-btn" id="save-note">Agregar Idea</button>
+        <div class="modal-footer-right">
+          <button class="action-btn secondary-btn" id="cancel-note">Cancelar</button>
+          <button class="action-btn primary-btn" id="save-note">Agregar Idea</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1629,8 +1712,13 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="action-btn secondary-btn" id="cancel-board">Cancelar</button>
-        <button class="action-btn primary-btn" id="save-board-name">Guardar</button>
+        <button class="action-btn danger-btn" id="delete-board-modal-btn" style="display:none;">
+          <i class="fas fa-trash"></i> <span>Eliminar Pizarra</span>
+        </button>
+        <div class="modal-footer-right">
+          <button class="action-btn secondary-btn" id="cancel-board">Cancelar</button>
+          <button class="action-btn primary-btn" id="save-board-name">Guardar</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1676,8 +1764,10 @@
         <div class="user-list" id="user-list"></div>
       </div>
       <div class="modal-footer">
-        <button class="action-btn secondary-btn" id="cancel-user-selection">Cancelar</button>
-        <button class="action-btn primary-btn" id="confirm-user-selection">Confirmar</button>
+        <div class="modal-footer-right">
+          <button class="action-btn secondary-btn" id="cancel-user-selection">Cancelar</button>
+          <button class="action-btn primary-btn" id="confirm-user-selection">Confirmar</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1699,7 +1789,9 @@
         <div class="users-container" id="users-container"></div>
       </div>
       <div class="modal-footer">
-        <button class="action-btn secondary-btn" id="close-user-management">Cerrar</button>
+        <div class="modal-footer-right">
+          <button class="action-btn secondary-btn" id="close-user-management">Cerrar</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1738,8 +1830,10 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="action-btn secondary-btn" id="cancel-add-user">Cancelar</button>
-        <button class="action-btn primary-btn" id="save-user">Guardar Usuario</button>
+        <div class="modal-footer-right">
+          <button class="action-btn secondary-btn" id="cancel-add-user">Cancelar</button>
+          <button class="action-btn primary-btn" id="save-user">Guardar Usuario</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1754,11 +1848,14 @@
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
     const menuToggle = document.getElementById('menu-toggle');
+    const manageToggleBtn = document.getElementById('manage-toggle-btn');
+    const manageDrawer = document.getElementById('manage-drawer');
     const addNoteBtn = document.getElementById('add-note-btn');
     const emptyAddBtn = document.getElementById('empty-add-btn');
     const noteModal = document.getElementById('note-modal');
     const shareModal = document.getElementById('share-modal');
     const boardNameModal = document.getElementById('board-name-modal');
+    const deleteBoardModalBtn = document.getElementById('delete-board-modal-btn');
     const userSelectionModal = document.getElementById('user-selection-modal');
     const userManagementModal = document.getElementById('user-management-modal');
     const addUserModal = document.getElementById('add-user-modal');
@@ -1852,6 +1949,12 @@
         sidebarOverlay.classList.remove('open');
       });
 
+      manageToggleBtn.addEventListener('click', () => {
+        const isOpen = manageDrawer.classList.toggle('open');
+        manageToggleBtn.classList.toggle('open', isOpen);
+        manageToggleBtn.setAttribute('aria-expanded', String(isOpen));
+      });
+
       addNoteBtn.addEventListener('click', () => {
         if (!currentBoardId) { showToast('Primero crea una pizarra', 'error'); return; }
         openNoteModal();
@@ -1908,6 +2011,15 @@
         openBoardNameModal(true);
       });
 
+      deleteBoardModalBtn.addEventListener('click', () => {
+        if (!currentBoardId) return;
+        const deleted = deleteBoard(currentBoardId);
+        if (deleted) {
+          boardNameModal.style.display = 'none';
+          resetBoardModal();
+        }
+      });
+
       saveBoardName.addEventListener('click', () => {
         const name = boardNameInput.value.trim();
         if (!name) { showToast('Por favor ingresa un nombre para la pizarra', 'error'); return; }
@@ -1916,7 +2028,11 @@
           boards[currentBoardId].name = name;
           currentBoardName.textContent = name;
           const tab = document.querySelector(`.tab[data-board-id="${currentBoardId}"]`);
-          if (tab) tab.querySelector('.tab-name').textContent = name;
+          if (tab) {
+            tab.title = `${name} (Doble clic o doble tap para eliminar)`;
+            tab.querySelector('.tab-name').textContent = name;
+          }
+          saveToLocalStorage();
           showToast('Nombre actualizado', 'success');
         } else {
           createNewBoard(name);
@@ -1967,12 +2083,14 @@
 
     function openBoardNameModal(editing = false) {
       isEditingBoard = editing;
-      if (editing) {
-        boardModalTitle.textContent = 'Editar Nombre de Pizarra';
+      if (editing && currentBoardId && boards[currentBoardId]) {
+        boardModalTitle.textContent = 'Editar Pizarra';
         boardNameInput.value = boards[currentBoardId].name;
+        deleteBoardModalBtn.style.display = 'inline-flex';
       } else {
         boardModalTitle.textContent = 'Nueva Pizarra';
         boardNameInput.value = '';
+        deleteBoardModalBtn.style.display = 'none';
       }
       boardNameModal.style.display = 'flex';
       closeSidebarOnMobile();
@@ -1981,6 +2099,7 @@
     function resetBoardModal() {
       isEditingBoard = false;
       boardNameInput.value = '';
+      deleteBoardModalBtn.style.display = 'none';
     }
 
     function openUserSelectionModal() {
@@ -2146,18 +2265,40 @@
       const tab = document.createElement('div');
       tab.className = 'tab';
       tab.setAttribute('data-board-id', boardId);
-      tab.innerHTML = `<span class="tab-name">${name}</span><button class="tab-close"><i class="fas fa-times"></i></button>`;
+      tab.title = `${name} (Doble clic o doble tap para eliminar)`;
 
-      tab.addEventListener('click', (e) => {
-        if (!e.target.closest('.tab-close')) {
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'tab-name';
+      nameSpan.textContent = name;
+      tab.appendChild(nameSpan);
+
+      let lastTapTime = 0;
+
+      const triggerDeleteFromTab = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        deleteBoard(boardId);
+      };
+
+      tab.addEventListener('dblclick', triggerDeleteFromTab);
+
+      tab.addEventListener('touchend', (e) => {
+        const now = Date.now();
+        const elapsed = now - lastTapTime;
+        if (elapsed > 0 && elapsed < 350) {
+          lastTapTime = 0;
+          triggerDeleteFromTab(e);
+        } else {
+          lastTapTime = now;
           switchToBoard(boardId);
           closeSidebarOnMobile();
         }
-      });
+      }, { passive: false });
 
-      tab.querySelector('.tab-close').addEventListener('click', (e) => {
-        e.stopPropagation();
-        closeBoard(boardId);
+      tab.addEventListener('click', (e) => {
+        if (e.detail >= 2) return;
+        switchToBoard(boardId);
+        closeSidebarOnMobile();
       });
 
       tabs.appendChild(tab);
@@ -2165,6 +2306,7 @@
     }
 
     function switchToBoard(boardId) {
+      if (!boards[boardId]) return;
       currentBoardId = boardId;
       currentBoardName.textContent = boards[boardId].name;
 
@@ -2176,12 +2318,16 @@
       updateUI();
     }
 
-    function closeBoard(boardId) {
-      if (Object.keys(boards).length === 1) {
-        if (!confirm('¿Estás seguro de que quieres cerrar la única pizarra? Se perderán los cambios no guardados.')) return;
-      } else {
-        if (!confirm('¿Estás seguro de que quieres cerrar esta pizarra? Se perderán los cambios no guardados.')) return;
-      }
+    function deleteBoard(boardId) {
+      const targetBoard = boards[boardId];
+      if (!targetBoard) return false;
+
+      const noteCount = Array.isArray(targetBoard.notes) ? targetBoard.notes.length : 0;
+      const confirmMessage = noteCount > 0
+        ? `¿Estás seguro de que quieres eliminar la pizarra "${targetBoard.name}"? Esta pizarra contiene ${noteCount} ${noteCount === 1 ? 'nota' : 'notas'} y se perderán.`
+        : `¿Estás seguro de que quieres eliminar la pizarra "${targetBoard.name}"?`;
+
+      if (!confirm(confirmMessage)) return false;
 
       delete boards[boardId];
 
@@ -2190,7 +2336,11 @@
 
       const remaining = Object.keys(boards);
       if (remaining.length > 0) {
-        switchToBoard(remaining[0]);
+        if (currentBoardId === boardId) {
+          switchToBoard(remaining[0]);
+        } else {
+          updateUI();
+        }
       } else {
         currentBoardId = null;
         currentBoardName.textContent = 'Sin pizarra activa';
@@ -2199,7 +2349,8 @@
       }
 
       saveToLocalStorage();
-      showToast('Pizarra cerrada', 'success');
+      showToast('Pizarra eliminada', 'success');
+      return true;
     }
 
     function updateUI() {
@@ -2531,68 +2682,64 @@
       showToast('Pizarrón guardado correctamente', 'success');
     }
 
-async function exportCurrentBoard() {
-  if (!currentBoardId || boards[currentBoardId].notes.length === 0) {
-    showToast('No hay ideas para exportar', 'error');
-    return;
-  }
+    async function exportCurrentBoard() {
+      if (!currentBoardId || boards[currentBoardId].notes.length === 0) {
+        showToast('No hay ideas para exportar', 'error');
+        return;
+      }
 
-  const today = new Date();
-  const formattedDate =
-    `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      const today = new Date();
+      const formattedDate =
+        `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
-  // Nombre EXACTO solicitado:
-  const fileName = `Genius_respaldo_(${formattedDate}).json`;
+      const fileName = `Genius_respaldo_(${formattedDate}).json`;
 
-  const dataStr = JSON.stringify(
-    {
-      board: boards[currentBoardId],
-      exportDate: new Date().toISOString()
-    },
-    null,
-    2
-  );
+      const dataStr = JSON.stringify(
+        {
+          board: boards[currentBoardId],
+          exportDate: new Date().toISOString()
+        },
+        null,
+        2
+      );
 
-  // ✅ Chrome/Edge: pregunta dónde guardar (Guardar como...)
-  if (window.showSaveFilePicker) {
-    try {
-      const handle = await window.showSaveFilePicker({
-        suggestedName: fileName,
-        types: [
-          {
-            description: 'Archivo JSON',
-            accept: { 'application/json': ['.json'] }
-          }
-        ]
-      });
+      if (window.showSaveFilePicker) {
+        try {
+          const handle = await window.showSaveFilePicker({
+            suggestedName: fileName,
+            types: [
+              {
+                description: 'Archivo JSON',
+                accept: { 'application/json': ['.json'] }
+              }
+            ]
+          });
 
-      const writable = await handle.createWritable();
-      await writable.write(dataStr);
-      await writable.close();
+          const writable = await handle.createWritable();
+          await writable.write(dataStr);
+          await writable.close();
 
-      showToast('Respaldo guardado correctamente', 'success');
-    } catch (err) {
-      // Usuario canceló el diálogo
-      if (err && err.name === 'AbortError') return;
-      console.error(err);
-      showToast('No se pudo guardar el respaldo', 'error');
+          showToast('Respaldo guardado correctamente', 'success');
+        } catch (err) {
+          if (err && err.name === 'AbortError') return;
+          console.error(err);
+          showToast('No se pudo guardar el respaldo', 'error');
+        }
+        return;
+      }
+
+      const blob = new Blob([dataStr], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+
+      showToast('Respaldo descargado correctamente', 'success');
     }
-    return;
-  }
-
-  // 🔁 Fallback: descarga normal (la ubicación depende del navegador)
-  const blob = new Blob([dataStr], { type: 'application/json;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = fileName;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-
-  showToast('Respaldo descargado correctamente', 'success');
-}
 
     function importBoard(event) {
       const file = event.target.files[0];
@@ -2726,22 +2873,20 @@ async function exportCurrentBoard() {
     init();
   </script>
 
-    <div style="display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;">
-        <img src="https://raw.githubusercontent.com/internalcontrolengineering/Desarrollos/main/LogoCI-G.png" 
-             alt="Control Interno" 
-             style="height: 22px; width: auto; object-fit: contain; opacity: 0.5;">
-        <div style="width: 1px; height: 24px; background-color: #cbd5e1;"></div>
-        <div style="display: flex; flex-direction: column; line-height: 1.2;">
-            <span style="font-size: 0.5rem; color: #0A2540;">Control Interno</span>
-            <span style="font-size: 0.4rem; color: #94a3b8; font-weight: 500;">Ingeniería de Control</span>
-        </div>
-        <div style="width: 1px; height: 24px; background-color: #cbd5e1;"></div>
-        <div style="display: flex; flex-direction: column; line-height: 1.2;">
-            <span style="font-size: 0.5rem; color: #0A2540;">Genius</span>
-            <span style="font-size: 0.4rem; color: #94a3b8; font-weight: 500;">V1.0 | Mayo 2026</span>
-        </div>
+  <div style="display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;">
+    <img src="https://raw.githubusercontent.com/internalcontrolengineering/Desarrollos/main/LogoCI-G.png"
+         alt="Control Interno"
+         style="height: 22px; width: auto; object-fit: contain; opacity: 0.5;">
+    <div style="width: 1px; height: 24px; background-color: #cbd5e1;"></div>
+    <div style="display: flex; flex-direction: column; line-height: 1.2;">
+      <span style="font-size: 0.5rem; color: #0A2540;">Control Interno</span>
+      <span style="font-size: 0.4rem; color: #94a3b8; font-weight: 500;">Ingeniería de Control</span>
     </div>
-
+    <div style="width: 1px; height: 24px; background-color: #cbd5e1;"></div>
+    <div style="display: flex; flex-direction: column; line-height: 1.2;">
+      <span style="font-size: 0.5rem; color: #0A2540;">Genius</span>
+      <span style="font-size: 0.4rem; color: #94a3b8; font-weight: 500;">V1.0 | Mayo 2026</span>
+    </div>
   </div>
 </body>
 </html>
