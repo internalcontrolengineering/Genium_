@@ -453,7 +453,7 @@
       padding: 8px 16px;
       background: var(--gradient-light);
       border-radius: var(--radius) var(--radius) 0 0;
-      cursor: pointer;
+      cursor: grab;
       transition: var(--transition);
       border: 1px solid transparent;
       border-bottom: none;
@@ -464,6 +464,20 @@
       overflow: hidden;
       box-shadow: var(--shadow);
       user-select: none;
+      touch-action: pan-x;
+    }
+
+    .tab:active {
+      cursor: grabbing;
+    }
+
+    .tab.dragging {
+      opacity: 0.55;
+      transform: scale(0.98);
+    }
+
+    .tab.drag-over {
+      border-left: 3px solid var(--primary);
     }
 
     .tab-name {
@@ -622,17 +636,22 @@
       font-size: 0.78rem;
       color: #64748b;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 3px;
     }
 
-    .note-footer span {
+    .note-footer-line {
+      display: block;
+      width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      max-width: 100%;
+    }
+
+    .note-footer-author {
+      font-weight: 600;
+      color: #475569;
     }
 
     .note.expanded {
@@ -657,7 +676,7 @@
       line-height: 1.65;
     }
 
-    .note.expanded .note-footer span {
+    .note.expanded .note-footer-line {
       white-space: normal;
       overflow: visible;
     }
@@ -1513,6 +1532,7 @@
       .note-title{ color: rgba(15,23,42,.90); }
       .note-content{ color: rgba(15,23,42,.80); }
       .note-footer{ color: rgba(15,23,42,.70); }
+      .note-footer-author{ color: rgba(15,23,42,.82); }
     }
 
     @media (prefers-color-scheme: dark) {
@@ -1947,6 +1967,7 @@
     let selectedUserForSharing = null;
     let currentSharingMethod = null;
     let editingUserId = null;
+    let draggedTabBoardId = null;
 
     function init() {
       loadFromLocalStorage();
@@ -2051,7 +2072,7 @@
           currentBoardName.textContent = name;
           const tab = document.querySelector(`.tab[data-board-id="${currentBoardId}"]`);
           if (tab) {
-            tab.title = `${name} (Doble clic o doble tap para eliminar)`;
+            tab.title = `${name} (Arrastra para reordenar · Doble clic o tap para eliminar)`;
             tab.querySelector('.tab-name').textContent = name;
           }
           saveToLocalStorage();
@@ -2132,24 +2153,30 @@
       return users.find(u => String(u.id) === String(authorId)) || null;
     }
 
-    function formatNoteFooterText(note) {
+    function buildNoteFooterHTML(note) {
       const created = new Date(note.createdAt);
       const date = created.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
       const author = getUserById(note.authorId);
+      const createdLine = `Creado: ${date}`;
+      const authorLine = author ? `Propuesta por: ${author.name}` : '';
+      const fullTitle = author ? `${createdLine} - ${authorLine}` : createdLine;
+
       if (author) {
-        return `Creado: ${date} · Por: ${author.name}`;
+        return `
+          <span class="note-footer-line" title="${fullTitle}">${createdLine}</span>
+          <span class="note-footer-line note-footer-author" title="${fullTitle}">${authorLine}</span>
+        `;
       }
-      return `Creado: ${date}`;
+      return `<span class="note-footer-line" title="${fullTitle}">${createdLine}</span>`;
     }
 
     function refreshAllNotesFooter() {
       Object.values(boards).forEach(b => {
         if (!Array.isArray(b.notes)) return;
         b.notes.forEach(note => {
-          const el = document.querySelector(`.note[data-id="${note.id}"] .note-footer span`);
-          if (el && b.id === currentBoardId) {
-            el.textContent = formatNoteFooterText(note);
-            el.title = formatNoteFooterText(note);
+          const footerEl = document.querySelector(`.note[data-id="${note.id}"] .note-footer`);
+          if (footerEl && b.id === currentBoardId) {
+            footerEl.innerHTML = buildNoteFooterHTML(note);
           }
         });
       });
@@ -2337,11 +2364,48 @@
       return boardId;
     }
 
+    function syncBoardsOrderFromDOM() {
+      const orderedBoards = {};
+      const domTabs = tabs.querySelectorAll('.tab[data-board-id]');
+      domTabs.forEach(t => {
+        const id = t.getAttribute('data-board-id');
+        if (boards[id]) {
+          orderedBoards[id] = boards[id];
+        }
+      });
+      Object.keys(boards).forEach(id => {
+        if (!orderedBoards[id]) {
+          orderedBoards[id] = boards[id];
+        }
+      });
+      boards = orderedBoards;
+      saveToLocalStorage();
+    }
+
+    function moveTabBefore(sourceBoardId, targetBoardId) {
+      if (!sourceBoardId || !targetBoardId || sourceBoardId === targetBoardId) return;
+      const sourceTab = tabs.querySelector(`.tab[data-board-id="${sourceBoardId}"]`);
+      const targetTab = tabs.querySelector(`.tab[data-board-id="${targetBoardId}"]`);
+      if (!sourceTab || !targetTab) return;
+
+      const rect = targetTab.getBoundingClientRect();
+      const sourceIndex = Array.from(tabs.children).indexOf(sourceTab);
+      const targetIndex = Array.from(tabs.children).indexOf(targetTab);
+
+      if (sourceIndex < targetIndex) {
+        tabs.insertBefore(sourceTab, targetTab.nextSibling);
+      } else {
+        tabs.insertBefore(sourceTab, targetTab);
+      }
+      syncBoardsOrderFromDOM();
+    }
+
     function createTab(boardId, name) {
       const tab = document.createElement('div');
       tab.className = 'tab';
       tab.setAttribute('data-board-id', boardId);
-      tab.title = `${name} (Doble clic o doble tap para eliminar)`;
+      tab.setAttribute('draggable', 'true');
+      tab.title = `${name} (Arrastra para reordenar · Doble clic o tap para eliminar)`;
 
       const nameSpan = document.createElement('span');
       nameSpan.className = 'tab-name';
@@ -2349,6 +2413,10 @@
       tab.appendChild(nameSpan);
 
       let lastTapTime = 0;
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let isTouchDragging = false;
+      let touchClone = null;
 
       const triggerDeleteFromTab = (e) => {
         e.preventDefault();
@@ -2356,9 +2424,95 @@
         deleteBoard(boardId);
       };
 
-      tab.addEventListener('dblclick', triggerDeleteFromTab);
+      tab.addEventListener('dragstart', (e) => {
+        draggedTabBoardId = boardId;
+        tab.classList.add('dragging');
+        if (e.dataTransfer) {
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', boardId);
+        }
+      });
+
+      tab.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        if (draggedTabBoardId && draggedTabBoardId !== boardId) {
+          tab.classList.add('drag-over');
+        }
+        if (e.dataTransfer) {
+          e.dataTransfer.dropEffect = 'move';
+        }
+      });
+
+      tab.addEventListener('dragleave', () => {
+        tab.classList.remove('drag-over');
+      });
+
+      tab.addEventListener('drop', (e) => {
+        e.preventDefault();
+        tab.classList.remove('drag-over');
+        const sourceId = draggedTabBoardId || (e.dataTransfer && e.dataTransfer.getData('text/plain'));
+        if (sourceId && sourceId !== boardId) {
+          moveTabBefore(sourceId, boardId);
+        }
+      });
+
+      tab.addEventListener('dragend', () => {
+        draggedTabBoardId = null;
+        tabs.querySelectorAll('.tab').forEach(t => {
+          t.classList.remove('dragging');
+          t.classList.remove('drag-over');
+        });
+      });
+
+      tab.addEventListener('touchstart', (e) => {
+        if (!e.touches || e.touches.length === 0) return;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        isTouchDragging = false;
+      }, { passive: true });
+
+      tab.addEventListener('touchmove', (e) => {
+        if (!e.touches || e.touches.length === 0) return;
+        const touch = e.touches[0];
+        const dx = Math.abs(touch.clientX - touchStartX);
+        const dy = Math.abs(touch.clientY - touchStartY);
+
+        if (!isTouchDragging && dx > 12 && dx > dy * 1.3) {
+          isTouchDragging = true;
+          draggedTabBoardId = boardId;
+          tab.classList.add('dragging');
+        }
+
+        if (isTouchDragging) {
+          e.preventDefault();
+          const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
+          const overTab = targetEl ? targetEl.closest('.tab') : null;
+          tabs.querySelectorAll('.tab').forEach(t => t.classList.remove('drag-over'));
+          if (overTab && overTab !== tab) {
+            overTab.classList.add('drag-over');
+          }
+        }
+      }, { passive: false });
 
       tab.addEventListener('touchend', (e) => {
+        const overTab = tabs.querySelector('.tab.drag-over');
+        tabs.querySelectorAll('.tab').forEach(t => {
+          t.classList.remove('dragging');
+          t.classList.remove('drag-over');
+        });
+
+        if (isTouchDragging) {
+          if (overTab) {
+            const targetId = overTab.getAttribute('data-board-id');
+            if (targetId && targetId !== boardId) {
+              moveTabBefore(boardId, targetId);
+            }
+          }
+          draggedTabBoardId = null;
+          isTouchDragging = false;
+          return;
+        }
+
         const now = Date.now();
         const elapsed = now - lastTapTime;
         if (elapsed > 0 && elapsed < 350) {
@@ -2370,6 +2524,8 @@
           closeSidebarOnMobile();
         }
       }, { passive: false });
+
+      tab.addEventListener('dblclick', triggerDeleteFromTab);
 
       tab.addEventListener('click', (e) => {
         if (e.detail >= 2) return;
@@ -2581,8 +2737,6 @@
         el.style.width = '240px';
       }
 
-      const footerText = formatNoteFooterText(note);
-
       el.innerHTML = `
         <div class="note-header">
           <div class="note-color" style="background-color: ${getDarkerColor(note.color)};"></div>
@@ -2594,7 +2748,7 @@
         </div>
         <div class="note-title">${note.title}</div>
         <div class="note-content">${note.content}</div>
-        <div class="note-footer"><span title="${footerText}">${footerText}</span></div>
+        <div class="note-footer">${buildNoteFooterHTML(note)}</div>
       `;
 
       el.querySelector('.delete-note').addEventListener('click', (e) => { e.stopPropagation(); deleteNote(note.id); });
@@ -2647,11 +2801,9 @@
         el.querySelector('.note-color').style.backgroundColor = getDarkerColor(color);
         el.querySelector('.note-title').textContent = title || 'Nueva idea';
         el.querySelector('.note-content').textContent = content;
-        const footerSpan = el.querySelector('.note-footer span');
-        if (footerSpan) {
-          const footerText = formatNoteFooterText(data.notes[idx]);
-          footerSpan.textContent = footerText;
-          footerSpan.title = footerText;
+        const footerEl = el.querySelector('.note-footer');
+        if (footerEl) {
+          footerEl.innerHTML = buildNoteFooterHTML(data.notes[idx]);
         }
       }
 
