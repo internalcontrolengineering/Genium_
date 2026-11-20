@@ -624,6 +624,15 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .note-footer span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 100%;
     }
 
     .note.expanded {
@@ -646,6 +655,11 @@
       max-height: none;
       overflow: visible;
       line-height: 1.65;
+    }
+
+    .note.expanded .note-footer span {
+      white-space: normal;
+      overflow: visible;
     }
 
     @media (max-width: 768px) {
@@ -1670,6 +1684,12 @@
           <label for="note-title">Título (opcional)</label>
           <input type="text" id="note-title" class="form-control" placeholder="Título de la idea" />
         </div>
+        <div class="form-group" id="note-author-group" style="display:none;">
+          <label for="note-author">Propuesta por</label>
+          <select id="note-author" class="form-control">
+            <option value="">Sin asignar</option>
+          </select>
+        </div>
         <div class="form-group">
           <label for="note-content">Contenido</label>
           <textarea id="note-content" class="form-control" rows="4" placeholder="Describe tu idea..."></textarea>
@@ -1853,6 +1873,8 @@
     const addNoteBtn = document.getElementById('add-note-btn');
     const emptyAddBtn = document.getElementById('empty-add-btn');
     const noteModal = document.getElementById('note-modal');
+    const noteAuthorGroup = document.getElementById('note-author-group');
+    const noteAuthorSelect = document.getElementById('note-author');
     const shareModal = document.getElementById('share-modal');
     const boardNameModal = document.getElementById('board-name-modal');
     const deleteBoardModalBtn = document.getElementById('delete-board-modal-btn');
@@ -2081,6 +2103,58 @@
       }
     }
 
+    function populateNoteAuthorSelect(selectedAuthorId = '') {
+      if (users.length === 0) {
+        noteAuthorGroup.style.display = 'none';
+        noteAuthorSelect.innerHTML = '<option value="">Sin asignar</option>';
+        noteAuthorSelect.value = '';
+        return;
+      }
+
+      noteAuthorGroup.style.display = 'block';
+      noteAuthorSelect.innerHTML = '<option value="">Sin asignar</option>';
+
+      users.forEach(user => {
+        const opt = document.createElement('option');
+        opt.value = String(user.id);
+        opt.textContent = `${user.name} (${user.role})`;
+        noteAuthorSelect.appendChild(opt);
+      });
+
+      const validSelected = selectedAuthorId && users.some(u => String(u.id) === String(selectedAuthorId))
+        ? String(selectedAuthorId)
+        : '';
+      noteAuthorSelect.value = validSelected;
+    }
+
+    function getUserById(authorId) {
+      if (authorId === null || authorId === undefined || authorId === '') return null;
+      return users.find(u => String(u.id) === String(authorId)) || null;
+    }
+
+    function formatNoteFooterText(note) {
+      const created = new Date(note.createdAt);
+      const date = created.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      const author = getUserById(note.authorId);
+      if (author) {
+        return `Creado: ${date} · Por: ${author.name}`;
+      }
+      return `Creado: ${date}`;
+    }
+
+    function refreshAllNotesFooter() {
+      Object.values(boards).forEach(b => {
+        if (!Array.isArray(b.notes)) return;
+        b.notes.forEach(note => {
+          const el = document.querySelector(`.note[data-id="${note.id}"] .note-footer span`);
+          if (el && b.id === currentBoardId) {
+            el.textContent = formatNoteFooterText(note);
+            el.title = formatNoteFooterText(note);
+          }
+        });
+      });
+    }
+
     function openBoardNameModal(editing = false) {
       isEditingBoard = editing;
       if (editing && currentBoardId && boards[currentBoardId]) {
@@ -2239,6 +2313,7 @@
       addUserModal.style.display = 'none';
       resetUserModal();
       renderUsers();
+      refreshAllNotesFooter();
       saveToLocalStorage();
     }
 
@@ -2246,6 +2321,7 @@
       if (confirm('¿Estás seguro de que quieres eliminar este usuario?')) {
         users = users.filter(u => u.id !== userId);
         renderUsers();
+        refreshAllNotesFooter();
         saveToLocalStorage();
         showToast('Usuario eliminado', 'success');
       }
@@ -2406,6 +2482,7 @@
         if (note) {
           document.getElementById('note-title').value = note.title || '';
           document.getElementById('note-content').value = note.content;
+          populateNoteAuthorSelect(note.authorId || '');
 
           const modalColors = document.querySelectorAll('#note-modal .color-option');
           modalColors.forEach(option => {
@@ -2422,6 +2499,7 @@
         }
       } else {
         resetNoteModal();
+        populateNoteAuthorSelect('');
       }
 
       noteModal.style.display = 'flex';
@@ -2431,6 +2509,8 @@
     function resetNoteModal() {
       document.getElementById('note-title').value = '';
       document.getElementById('note-content').value = '';
+      noteAuthorSelect.value = '';
+      noteAuthorGroup.style.display = 'none';
       noteModalTitle.textContent = 'Agregar Nueva Idea';
       isEditingNote = false;
       editingNoteId = null;
@@ -2439,21 +2519,22 @@
     function createNoteFromModal() {
       const title = document.getElementById('note-title').value;
       const content = document.getElementById('note-content').value;
+      const authorId = users.length > 0 && noteAuthorSelect.value ? parseInt(noteAuthorSelect.value, 10) : null;
 
       if (content.trim() === '') {
         showToast('Por favor, ingresa el contenido de la idea', 'error');
         return;
       }
 
-      if (isEditingNote) updateNote(editingNoteId, title, content, selectedColor);
-      else createNote(title, content, selectedColor);
+      if (isEditingNote) updateNote(editingNoteId, title, content, selectedColor, authorId);
+      else createNote(title, content, selectedColor, null, null, null, authorId);
 
       noteModal.style.display = 'none';
       resetNoteModal();
       showToast(`Idea ${isEditingNote ? 'actualizada' : 'agregada'} correctamente`, 'success');
     }
 
-    function createNote(title, content, color, id = null, x = null, y = null) {
+    function createNote(title, content, color, id = null, x = null, y = null, authorId = null) {
       if (!currentBoardId) return;
 
       const data = boards[currentBoardId];
@@ -2472,6 +2553,7 @@
         title: title || 'Nueva idea',
         content,
         color,
+        authorId: authorId || null,
         x: left,
         y: top,
         createdAt: new Date().toISOString()
@@ -2499,8 +2581,7 @@
         el.style.width = '240px';
       }
 
-      const created = new Date(note.createdAt);
-      const date = created.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      const footerText = formatNoteFooterText(note);
 
       el.innerHTML = `
         <div class="note-header">
@@ -2513,7 +2594,7 @@
         </div>
         <div class="note-title">${note.title}</div>
         <div class="note-content">${note.content}</div>
-        <div class="note-footer"><span>Creado: ${date}</span></div>
+        <div class="note-footer"><span title="${footerText}">${footerText}</span></div>
       `;
 
       el.querySelector('.delete-note').addEventListener('click', (e) => { e.stopPropagation(); deleteNote(note.id); });
@@ -2543,7 +2624,7 @@
       board.appendChild(el);
     }
 
-    function updateNote(noteId, title, content, color) {
+    function updateNote(noteId, title, content, color, authorId = null) {
       if (!currentBoardId) return;
 
       const data = boards[currentBoardId];
@@ -2558,6 +2639,7 @@
       data.notes[idx].title = title || 'Nueva idea';
       data.notes[idx].content = content;
       data.notes[idx].color = color;
+      data.notes[idx].authorId = authorId || null;
 
       const el = document.querySelector(`.note[data-id="${noteId}"]`);
       if (el) {
@@ -2565,6 +2647,12 @@
         el.querySelector('.note-color').style.backgroundColor = getDarkerColor(color);
         el.querySelector('.note-title').textContent = title || 'Nueva idea';
         el.querySelector('.note-content').textContent = content;
+        const footerSpan = el.querySelector('.note-footer span');
+        if (footerSpan) {
+          const footerText = formatNoteFooterText(data.notes[idx]);
+          footerSpan.textContent = footerText;
+          footerSpan.title = footerText;
+        }
       }
 
       saveToLocalStorage();
@@ -2761,7 +2849,7 @@
           const boardData = boards[boardId];
 
           if (Array.isArray(data.board.notes)) {
-            data.board.notes.forEach(n => createNote(n.title, n.content, n.color, n.id, n.x, n.y));
+            data.board.notes.forEach(n => createNote(n.title, n.content, n.color, n.id, n.x, n.y, n.authorId || null));
           }
           if (data.board.nextNoteId) boardData.nextNoteId = data.board.nextNoteId;
 
@@ -2804,7 +2892,11 @@
       const boardData = boards[currentBoardId];
       const subject = `Pizarrón Genium: ${boardData.name}`;
       let body = `Hola ${user.name},\n\nTe comparto mi pizarrón de lluvia de ideas: ${boardData.name}\n\n`;
-      boardData.notes.forEach((note, i) => { body += `${i+1}. ${note.title}\n   ${note.content}\n\n`; });
+      boardData.notes.forEach((note, i) => {
+        const author = getUserById(note.authorId);
+        const authorLine = author ? ` (Propuesta por: ${author.name})` : '';
+        body += `${i+1}. ${note.title}${authorLine}\n   ${note.content}\n\n`;
+      });
       body += `\n--\nCreado con Genium`;
       window.open(`mailto:${user.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
       shareModal.style.display = 'none';
@@ -2814,7 +2906,11 @@
       if (!currentBoardId || boards[currentBoardId].notes.length === 0) { showToast('No hay ideas para compartir', 'error'); return; }
       const boardData = boards[currentBoardId];
       let text = `Hola ${user.name},\n\n*${boardData.name}*\n\n`;
-      boardData.notes.forEach((note, i) => { text += `*${i+1}. ${note.title}*\n${note.content}\n\n`; });
+      boardData.notes.forEach((note, i) => {
+        const author = getUserById(note.authorId);
+        const authorLine = author ? ` _(${author.name})_` : '';
+        text += `*${i+1}. ${note.title}*${authorLine}\n${note.content}\n\n`;
+      });
       text += `_Creado con Genium_`;
       const phone = user.phone.replace(/\D/g, '');
       window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`);
